@@ -95,64 +95,6 @@ function get(serviceNowTable, callback) {
   });
 
 }
-/**
- * @function post
- * @description Call the ServiceNow POST API.
- *
- * @param {string} serviceNowTable - The table target of the ServiceNow table API.
- * @param {iapCallback} callback - Callback a function.
- * @param {*} callback.data - The API's response. Will be an object if sunnyday path.
- *   Will be HTML text if hibernating instance.
- * @param {error} callback.error - The error property of callback.
- */
-function post(serviceNowTable, callback) {
-
-  // Initialize return arguments for callback
-  let callbackData = null;
-  let callbackError = null;
-
-  // Construct API call to send to ServiceNow.
-  // The request constructor has an options parameter
-  // that holds the HTTP request method, credentials, and the API's URL.
-  // Some properties are hardcoded, like the method and part of the URI.
-  // Some properties are read from global const options.
-  // Some properties are passed into function get() through parameters.
-  const requestOptions = {
-    method: 'POST',
-    auth: {
-      user: options.username,
-      pass: options.password,
-    },
-    baseUrl: options.url,
-    uri: `/api/now/table/${serviceNowTable}`,
-  };
-
-  // Send Request to ServiceNow.
-  // We are passing variable requestOptions for the first argument.
-  // We are passing an anonymous function, an error-first callback,
-  // for the second argument.
-  request(requestOptions, (error, response, body) => {
-    /**
-     * Process ServiceNow error, response and body.
-     * Check error and response code to make sure
-     * response is good.
-     */
-    if (error) {
-      console.error('Error present.');
-      callbackError = error;
-    } else if (!validResponseRegex.test(response.statusCode)) {
-      console.error('Bad response code.');
-      callbackError = response;
-    } else if (response.body.includes('Hibernating Instance')) {
-      callbackError = 'Service Now instance is hibernating';
-      console.error(callbackError);
-    } else {
-      callbackData = response;
-    }
-    return callback(callbackData, callbackError);
-  });
-
-}
 
 
 // This test function calls your request and logs any errors.
