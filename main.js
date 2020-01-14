@@ -167,6 +167,12 @@ function main() {
     }
     console.log(`\nResponse returned from GET request:\n${JSON.stringify(data)}`)
   });
+  post('change_request', (data, error) => {
+    if (error) {
+      console.error(`\nError returned from POST request:\n${JSON.stringify(error)}`);
+    }
+    console.log(`\nResponse returned from POST request:\n${JSON.stringify(data)}`)
+  });
 }
 
 // Call main to run it.
