@@ -93,22 +93,11 @@ class ServiceNowAdapter extends EventEmitter {
    * @param {ServiceNowAdapter~requestCallback} [callback] - The optional callback
    *   that handles the response.
    */
-/*
   healthcheck(callback) {
     // We will build this method in a later lab. For now, it will emulate
     // a healthy integration by emmitting ONLINE.
-    // this.emitOnline();
+    this.emitOnline();
   }
-  */
-  healthcheck(callback) {
-    this.getRecord((result, error) => {
-        if (error) {
-            this.emitStatus('OFFLINE');
-        } else {
-            this.emitOnline();
-        }
-    });
-}
 
   /**
    * @memberof ServiceNowAdapter
@@ -156,22 +145,6 @@ class ServiceNowAdapter extends EventEmitter {
    * @param {ServiceNowAdapter~requestCallback} callback - The callback that
    *   handles the response.
    */
-  convertData(results) {
-    let recordFound=JSON.parse(results.body).result;
-    let tickets = [];
-    recordFound.forEach((record) =>{
-        tickets.push({
-            change_ticket_number : record.number,
-            change_ticket_key : record.sys_id,
-            active : record.active,
-            priority : record.priority,
-            description : record.description,
-            work_start : record.work_start,
-            work_end: record.work_end
-        }  )
-    })
-    return tickets;
-  }
   getRecord(callback) {
     /**
      * Write the body for this function.
@@ -179,13 +152,7 @@ class ServiceNowAdapter extends EventEmitter {
      * Note how the object was instantiated in the constructor().
      * get() takes a callback function.
      */
-     //this.connector.get(this.props,callback);
-     this.connector.get(this.props,(results, error) => {
-         if(results) {
-             return callback(this.convertData(results),error);
-        }
-        callback(results,error);
-     });
+     this.connector.get(this.props,callback);
   }
 
   /**
@@ -198,38 +165,14 @@ class ServiceNowAdapter extends EventEmitter {
    *   handles the response.
    */
   postRecord(callback) {
-      this.connector.post(this.props,(results, error) => {
-         if(results) {
-             let record=JSON.parse(results.body).result;
-             return callback({
-                    change_ticket_number : record.number,
-                    change_ticket_key : record.sys_id,
-                    active : record.active,
-                    priority : record.priority,
-                    description : record.description,
-                    work_start : record.work_start,
-                    work_end: record.work_end
-                },error);
-        }
-        callback(results,error);
-     });
+      this.connector.post(this.props,callback);
+    /**
+     * Write the body for this function.
+     * The function is a wrapper for this.connector's post() method.
+     * Note how the object was instantiated in the constructor().
+     * post() takes a callback function.
+     */
   }
 }
 
 module.exports = ServiceNowAdapter;
-console.log('Partito')
-const sv= new ServiceNowAdapter('xxxxxxxxx',{
-        "url": "https://dev84102.service-now.com/",
-        "auth": {
-            "username": "admin",
-            "password": "Fapal_64"
-        },
-        "serviceNowTable": "change_request"
-    })
-//sv.getRecord((tickets,error) => {
-sv.postRecord((tickets,error) => {
-    if(error)
-        return console.log(`\n----ERRORE :\n${JSON.stringify(error)}`)
-    console.log(`\n----TICKETS :\n${JSON.stringify(tickets)}`)
-} ) ;
-console.log('Terminato')
